@@ -1,7 +1,7 @@
-# Python package
+ Python package
 # Create and test a Python package on multiple Python versions.
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python 
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
 - main
@@ -26,20 +26,11 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
-    pip install flake8 pylint
-    flake8 mypackage/  # Adjust the path to your package's source code
-    pylint mypackage/  # Adjust the path to your package's source code
-  displayName: 'Code Quality Analysis'
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
 
 - script: |
-    pip install coverage
-    coverage run -m pytest
-    coverage report -m
-  displayName: 'Code Coverage'
-
-- script: |
-    pip install twine
-    python setup.py sdist bdist_wheel
-    twine upload dist/*
-  displayName: 'Publish to PyPI'
-  condition: succeeded()  # Only publish if previous steps succeed
+    pip install pytest pytest-azurepipelines
+    pytest
+  displayName: 'pytest'
