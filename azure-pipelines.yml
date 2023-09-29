@@ -25,12 +25,21 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+ - script: |
+      pip install flake8 pylint
+      flake8 mypackage/  # Adjust the path to your package's source code
+      pylint mypackage/  # Adjust the path to your package's source code
+    displayName: 'Code Quality Analysis'
 
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-  displayName: 'pytest'
+  - script: |
+      pip install coverage
+      coverage run -m pytest
+      coverage report -m
+    displayName: 'Code Coverage'
+
+  - script: |
+      pip install twine
+      python setup.py sdist bdist_wheel
+      twine upload dist/*
+    displayName: 'Publish to PyPI'
+    condition: succeeded()  # Only publish if previous steps succeed
